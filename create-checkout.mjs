@@ -1,5 +1,5 @@
 import { getStore } from "@netlify/blobs";
-import { randomUUID } from "node:crypto";
+import { randomUUID, timingSafeEqual } from "node:crypto";
 
 const json = (o, status = 200) =>
   new Response(JSON.stringify(o), { status, headers: { "Content-Type": "application/json" } });
@@ -7,8 +7,10 @@ const json = (o, status = 200) =>
 export default async (req) => {
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
   let idea = "";
-  try { ({ idea } = await req.json()); } catch {}
+  let promo = "";
+  try { ({ idea, promo } = await req.json()); } catch {}
   idea = String(idea || "").trim();
+  promo = String(promo || "").trim();
   if (idea.length < 30 || idea.length > 2000)
     return json({ error: "Please describe your idea in 30 to 2000 characters." }, 400);
 
@@ -16,6 +18,17 @@ export default async (req) => {
   await getStore("ideas").set(id, idea);
 
   const site = process.env.URL || new URL(req.url).origin;
+
+  // Promo code bypass (testing): code is set in the PROMO_BYPASS_CODE environment variable
+  if (promo) {
+    const expected = Buffer.from((process.env.PROMO_BYPASS_CODE || "").toLowerCase());
+    const given = Buffer.from(promo.toLowerCase());
+    const ok = expected.length > 0 && expected.length === given.length && timingSafeEqual(expected, given);
+    if (!ok) return json({ error: "That promo code is not valid." }, 400);
+    await getStore("free").set(id, "1");
+    return json({ url: `${site}/plan.html?free=${id}` });
+  }
+
   const body = new URLSearchParams({
     mode: "payment",
     "line_items[0][price_data][currency]": "aud",

@@ -19,6 +19,7 @@ h1{font-size:clamp(2.2rem,6vw,3.4rem);margin:64px 0 18px}
 h2{font-size:1.6rem;margin:36px 0 10px}h3{font-size:1.25rem}
 p{color:var(--soft)}
 label{display:block;font-weight:700;margin:28px 0 8px}
+input[type=text]{width:100%;max-width:320px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
 textarea{width:100%;min-height:200px;padding:14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px;resize:vertical}
 .btn{display:inline-block;margin-top:18px;padding:14px 24px;border:2px solid var(--ink);background:var(--ink);color:var(--cream);font:700 1rem var(--sans);cursor:pointer;border-radius:2px}
 .btn:hover{background:transparent;color:var(--ink)}.btn:disabled{opacity:.5;cursor:wait}
@@ -39,9 +40,11 @@ footer{margin:80px 0 40px;font-size:.9rem;color:var(--soft)}
   <label for="idea">Your idea (who it is for and what problem it solves)</label>
   <textarea id="idea" maxlength="2000" placeholder="e.g. A booking app for mobile dog groomers in regional Australia, who currently take bookings by text message..."></textarea>
   <p class="small"><span id="count">0</span> / 2000 characters. Please do not include confidential or personal information.</p>
-  <button class="btn" id="go">Pay AUD $20 and get my plan</button>
+  <label for="promo">Promo code (optional)</label>
+  <input id="promo" type="text" autocomplete="off" spellcheck="false" maxlength="40">
+  <button class="btn" id="go">Get my plan (AUD $20)</button>
   <p class="err" id="msg" role="alert"></p>
-  <p class="small">Payment is handled securely by Stripe. Plans are AI-generated guidance to help you get started, not professional, legal or financial advice.</p>
+  <p class="small">Payment is handled securely by Stripe.</p>
 </section>
 
 <section id="result" hidden>
@@ -59,6 +62,7 @@ const $=s=>document.querySelector(s);
 const msg=t=>$('#msg').textContent=t;
 const params=new URLSearchParams(location.search);
 const sid=params.get('session_id');
+const freeId=params.get('free');
 
 $('#idea').addEventListener('input',e=>$('#count').textContent=e.target.value.length);
 
@@ -67,7 +71,7 @@ $('#go').onclick=async()=>{
   if(idea.length<30){msg('Please write at least a couple of sentences about your idea.');return}
   msg('');$('#go').disabled=true;
   try{
-    const r=await fetch('/.netlify/functions/create-checkout',{method:'POST',body:JSON.stringify({idea})});
+    const r=await fetch('/.netlify/functions/create-checkout',{method:'POST',body:JSON.stringify({idea,promo:$('#promo').value})});
     const d=await r.json();
     if(!r.ok||!d.url)throw new Error(d.error||'Something went wrong.');
     location.href=d.url;
@@ -75,11 +79,11 @@ $('#go').onclick=async()=>{
 };
 
 if(params.get('cancelled'))msg('Payment cancelled. You have not been charged.');
-if(sid){$('#form').hidden=true;$('#result').hidden=false;load()}
+if(sid||freeId){$('#form').hidden=true;$('#result').hidden=false;load()}
 
 async function load(){
   try{
-    const r=await fetch('/.netlify/functions/get-plan?session_id='+encodeURIComponent(sid));
+    const r=await fetch('/.netlify/functions/get-plan?'+(freeId?'free='+encodeURIComponent(freeId):'session_id='+encodeURIComponent(sid)));
     const p=await r.json();
     if(!r.ok)throw new Error(p.error||'Something went wrong.');
     render(p);
