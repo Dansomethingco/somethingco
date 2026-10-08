@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Startup idea check | something.co</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Zilla+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F8F6EE;--cream-2:#EEEBDC;--line:#D6D2BF;--ink:#1E1D1A;--soft:#55524A;--slab:'Zilla Slab','Rockwell',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font:17px/1.65 var(--sans)}
+a{color:inherit}:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+header{border-bottom:1px solid var(--line)}
+.nav{display:flex;justify-content:space-between;align-items:center;height:72px}
+.logo{font:500 1.5rem var(--slab);text-decoration:none}
+h1,h2,h3{font-family:var(--slab);font-weight:500;line-height:1.12}
+h1{font-size:clamp(2.2rem,6vw,3.4rem);margin:64px 0 18px}
+h2{font-size:1.6rem;margin:36px 0 10px}h3{font-size:1.25rem}
+p{color:var(--soft)}
+label{display:block;font-weight:700;margin:28px 0 8px}
+input[type=text]{width:100%;max-width:320px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
+textarea{width:100%;min-height:200px;padding:14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px;resize:vertical}
+.btn{display:inline-block;margin-top:18px;padding:14px 24px;border:2px solid var(--ink);background:var(--ink);color:var(--cream);font:700 1rem var(--sans);cursor:pointer;border-radius:2px}
+.btn:hover{background:transparent;color:var(--ink)}.btn:disabled{opacity:.5;cursor:wait}
+.small{font-size:.9rem;margin-top:14px}.err{color:#8A2A1B;font-weight:700;margin-top:14px}
+.stage{border-top:1px solid var(--ink);padding:18px 0}.stage ul,ul.plain{margin:8px 0 0 20px;color:var(--soft)}
+.meta{font-size:.92rem;color:var(--soft);margin-top:6px}
+footer{margin:80px 0 40px;font-size:.9rem;color:var(--soft)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header><div class="wrap nav"><a class="logo" href="index.html">something.co</a><a href="index.html#contact">Contact</a></div></header>
+<main class="wrap">
+
+<section id="form">
+  <h1>Check your startup idea in minutes.</h1>
+  <p>Describe your idea in a few sentences. You will get a short, honest assessment and a practical plan from idea to first MVP, as a PDF you can keep. Cost: AUD $20, one-off.</p>
+  <label for="idea">Your idea (who it is for and what problem it solves)</label>
+  <textarea id="idea" maxlength="2000" placeholder="e.g. A booking app for mobile dog groomers in regional Australia, who currently take bookings by text message..."></textarea>
+  <p class="small"><span id="count">0</span> / 2000 characters. Please do not include confidential or personal information.</p>
+  <label for="promo">Promo code (optional)</label>
+  <input id="promo" type="text" autocomplete="off" spellcheck="false" maxlength="40">
+  <button class="btn" id="go">Get my plan (AUD $20)</button>
+  <p class="err" id="msg" role="alert"></p>
+  <p class="small">Payment is handled securely by Stripe.</p>
+</section>
+
+<section id="result" hidden>
+  <h1 id="r-title">Preparing your plan...</h1>
+  <p id="r-status">This takes around 20 to 40 seconds. Please keep this page open.</p>
+  <div id="r-body"></div>
+</section>
+
+<footer>&copy; Dan Smart, something.co. Perth, Australia.</footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const safeJson=async r=>{const t=await r.text();try{return JSON.parse(t)}catch{return{error:'Server error ('+r.status+'). The function may not be deployed or set up yet.'}}};
+const msg=t=>$('#msg').textContent=t;
+const params=new URLSearchParams(location.search);
+const sid=params.get('session_id');
+const freeId=params.get('free');
+
+$('#idea').addEventListener('input',e=>$('#count').textContent=e.target.value.length);
+
+$('#go').onclick=async()=>{
+  const idea=$('#idea').value.trim();
+  if(idea.length<30){msg('Please write at least a couple of sentences about your idea.');return}
+  msg('');$('#go').disabled=true;
+  try{
+    const r=await fetch('/.netlify/functions/create-checkout',{method:'POST',body:JSON.stringify({idea,promo:$('#promo').value})});
+    const d=await safeJson(r);
+    if(!r.ok||!d.url)throw new Error(d.error||'Something went wrong.');
+    location.href=d.url;
+  }catch(e){msg(e.message);$('#go').disabled=false}
+};
+
+if(params.get('cancelled'))msg('Payment cancelled. You have not been charged.');
+if(sid||freeId){$('#form').hidden=true;$('#result').hidden=false;load()}
+
+async function load(){
+  try{
+    const r=await fetch('/.netlify/functions/get-plan?'+(freeId?'free='+encodeURIComponent(freeId):'session_id='+encodeURIComponent(sid)));
+    const p=await safeJson(r);
+    if(!r.ok)throw new Error(p.error||'Something went wrong.');
+    render(p);
+  }catch(e){
+    $('#r-title').textContent='We hit a problem';
+    $('#r-status').textContent=e.message+' If you were charged, refresh this page and your plan will be generated, or email dan.somethingco@gmail.com.';
+  }
+}
+
+const el=(t,txt,c)=>{const n=document.createElement(t);if(txt)n.textContent=txt;if(c)n.className=c;return n};
+const list=(items,c)=>{const u=el('ul','',c||'');(items||[]).forEach(i=>u.append(el('li',i)));return u};
+
+function render(p){
+  $('#r-title').textContent=p.title||'Your startup plan';
+  $('#r-status').textContent='';
+  const b=$('#r-body');
+  const dl=el('button','Download PDF','btn');dl.onclick=()=>makePdf(p);b.append(dl);
+  b.append(el('h2','Summary'),el('p',p.summary),el('h2','Assessment'),el('p',p.verdict));
+  b.append(el('h3','Strengths'),list(p.strengths,'plain'),el('h3','Risks'),list(p.risks,'plain'));
+  b.append(el('h2','Idea to MVP: stages'));
+  (p.stages||[]).forEach((s,i)=>{
+    const d=el('div','','stage');
+    d.append(el('h3',`Stage ${i+1}: ${s.name}`),el('p',s.goal),list(s.actions),el('p',`Timeframe: ${s.timeframe}. Rough budget: ${s.budget}.`,'meta'));
+    b.append(d);
+  });
+  b.append(el('h2','Your first 30 days'),list(p.first_30_days,'plain'),el('h2','Next step'),el('p',p.next_step));
+  const call=el('p','Want help turning this into reality? Book a free 1 hour discovery workshop at dan.somethingco@gmail.com.');call.style.marginTop='24px';b.append(call);
+}
+
+function makePdf(p){
+  const d=new window.jspdf.jsPDF({unit:'mm',format:'a4'});
+  let y=20;const W=170;
+  const add=(t,size=11,bold=false,gap=2)=>{
+    d.setFont('helvetica',bold?'bold':'normal');d.setFontSize(size);
+    d.splitTextToSize(String(t||''),W).forEach(l=>{if(y>278){d.addPage();y=20}d.text(l,20,y);y+=size*0.42+1.8});
+    y+=gap;
+  };
+  const bullets=a=>(a||[]).forEach(i=>add('- '+i,11,false,0));
+  add('something.co  |  Startup idea assessment',9,false,6);
+  add(p.title,20,true,4);
+  add('Summary',13,true,1);add(p.summary,11,false,4);
+  add('Assessment',13,true,1);add(p.verdict,11,false,3);
+  add('Strengths',12,true,1);bullets(p.strengths);y+=3;
+  add('Risks',12,true,1);bullets(p.risks);y+=5;
+  add('Idea to MVP: stages',15,true,3);
+  (p.stages||[]).forEach((s,i)=>{
+    add(`Stage ${i+1}: ${s.name}`,12,true,1);add(s.goal,11,false,1);bullets(s.actions);
+    add(`Timeframe: ${s.timeframe}  |  Rough budget: ${s.budget}`,10,false,5);
+  });
+  add('Your first 30 days',15,true,2);bullets(p.first_30_days);y+=5;
+  add('Next step',13,true,1);add(p.next_step,11,false,6);
+  add('Free 1 hour discovery workshop: dan.somethingco@gmail.com  |  +61 424 383 329',10,true,4);
+  add('This plan is AI-generated guidance and is not professional, legal or financial advice.',8);
+  d.save('startup-idea-plan.pdf');
+}
+</script>
+</body>
+</html>
