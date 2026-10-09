@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Your plan | something.co</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Zilla+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F8F6EE;--cream-2:#EEEBDC;--line:#D6D2BF;--ink:#1E1D1A;--soft:#55524A;--slab:'Zilla Slab','Rockwell',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font:17px/1.65 var(--sans)}
+a{color:inherit}:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+header{border-bottom:1px solid var(--line)}
+.nav{display:flex;justify-content:space-between;align-items:center;height:72px}
+.logo{font:500 1.5rem var(--slab);text-decoration:none}
+h1,h2,h3{font-family:var(--slab);font-weight:500;line-height:1.12}
+h1{font-size:clamp(2.2rem,6vw,3.4rem);margin:64px 0 18px}
+h2{font-size:1.6rem;margin:36px 0 10px}h3{font-size:1.25rem}
+p{color:var(--soft)}
+label{display:block;font-weight:700;margin:28px 0 8px}
+input[type=text]{width:100%;max-width:320px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
+textarea{width:100%;min-height:200px;padding:14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px;resize:vertical}
+.btn{display:inline-block;margin-top:18px;padding:14px 24px;border:2px solid var(--ink);background:var(--ink);color:var(--cream);font:700 1rem var(--sans);cursor:pointer;border-radius:2px}
+.btn:hover{background:transparent;color:var(--ink)}.btn:disabled{opacity:.5;cursor:wait}
+.small{font-size:.9rem;margin-top:14px}.err{color:#8A2A1B;font-weight:700;margin-top:14px}
+.stage{border-top:1px solid var(--ink);padding:18px 0}.stage ul,ul.plain{margin:8px 0 0 20px;color:var(--soft)}
+.meta{font-size:.92rem;color:var(--soft);margin-top:6px}
+footer{margin:80px 0 40px;font-size:.9rem;color:var(--soft)}
+[hidden]{display:none!important}
+select,input[type=email],input[type=tel]{width:100%;max-width:420px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
+input[type=text]{max-width:420px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:#fff;border:2px solid var(--line);padding:14px 16px;margin-bottom:10px;cursor:pointer;border-radius:2px}
+.opt b{display:block}.opt span{font-size:.92rem;color:var(--soft)}.opt.sel{border-color:var(--ink);background:var(--cream-2)}
+.navb{display:flex;gap:10px;flex-wrap:wrap}.btn.alt{background:transparent;color:var(--ink)}.btn.alt:hover{background:var(--ink);color:var(--cream)}
+.sum{border:2px solid var(--ink);padding:14px 18px;margin:16px 0}.ln{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}.ln:last-child{border:0;font-weight:700}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:20px}.chk input{width:20px;height:20px;margin-top:4px}
+.wrap.w{max-width:1000px}h1{margin-top:40px}
+.grid{display:grid;gap:32px;margin-top:20px}@media(min-width:900px){.grid{grid-template-columns:1fr 1fr;align-items:start}.pan{position:sticky;top:16px}}
+.bar{height:8px;background:var(--line);margin:16px 0 4px}.bar i{display:block;height:100%;background:var(--ink)}
+.ph{margin-top:26px;border-bottom:2px solid var(--ink);display:flex;justify-content:space-between;align-items:baseline;padding-bottom:6px}.ph h2{margin:0;font-size:1.3rem}
+.st{display:flex;gap:12px;padding:12px 8px;cursor:pointer;border-bottom:1px solid var(--line)}.st.sel,.st:hover{background:var(--cream-2)}
+.cb{flex:none;width:26px;height:26px;border:2px solid var(--ink);background:none;color:transparent;cursor:pointer;border-radius:2px;font-size:15px;margin-top:2px}.done .cb{background:var(--ink);color:var(--cream)}.done .tt{text-decoration:line-through;color:var(--soft)}
+.tt{font-weight:700}.pan{border:2px solid var(--ink);padding:22px;background:#fff}.pan h2{margin-top:0}.pan h3{margin:20px 0 6px}
+.bub{background:var(--cream-2);padding:10px 12px;margin-top:8px;white-space:pre-wrap;font-size:.95rem}
+.back{display:none}.pan .btn{margin-right:8px}
+@media(max-width:899px){.pan{position:fixed;inset:0;z-index:5;overflow:auto;transform:translateY(100%);transition:transform .2s}.pan.open{transform:none}.back{display:inline-block;margin:0 0 12px}}
+@media(prefers-reduced-motion:reduce){.pan{transition:none}}
+</style></head><body>
+<header><div class="wrap nav"><a class="logo" href="index.html">something.co</a><a href="index.html#contact">Contact</a></div></header>
+<main class="wrap w" id="app"><p>Loading your plan...</p></main>
+<script>const $=s=>document.querySelector(s),Q=new URLSearchParams(location.search),T=Q.get('t'),SID=Q.get('sid'),API='/.netlify/functions/app-api';
+const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const post=b=>fetch(API,{method:'POST',body:JSON.stringify(Object.assign({t:T},b))}).then(r=>r.json()).catch(()=>({error:'Network error. Please try again.'}));
+let A=null,sel=null,det={};const all=()=>A.phases.flatMap(p=>p.steps);
+async function init(){
+ if(!T){$('#app').innerHTML='<h1>Open your private dashboard link.</h1><p>You get it right after checkout. Bookmark it: it is your way back in.</p>';return}
+ A=await fetch(API+'?t='+T+(SID?'&sid='+SID:'')).then(r=>r.json()).catch(()=>({error:'Network error.'}));
+ if(A.error){$('#app').innerHTML='<h1>We could not open this dashboard.</h1><p>'+esc(A.error)+'</p>';return}
+ if(SID)history.replaceState(null,'','app.html?t='+T);draw()}
+function panel(){
+ if(!sel)return'<p>Select a step to see how to approach it, useful searches and learnings.</p>';
+ const s=all().find(x=>x.id===sel);if(!s)return'';const d=det[sel],st=A.state[sel]||'todo',on=A.fu&&A.sub;
+ let h=`<button class="btn alt back" data-a="close">Back to plan</button><h2>${esc(s.id)} ${esc(s.title)}</h2><p>${esc(s.summary)}</p>`;
+ h+=!d?'<p>Preparing your guidance...</p>':d.err?`<p class="err">${esc(d.err)}</p>`:`<h3>How to approach this</h3><p style="white-space:pre-wrap">${esc(d.how)}</p><h3>Useful searches</h3><ul class="plain">${(d.search||[]).map(x=>`<li><a href="https://www.google.com/search?q=${encodeURIComponent(x)}" target="_blank" rel="noopener">${esc(x)}</a></li>`).join('')}</ul><h3>Learnings</h3><p>${esc(d.learnings)}</p>`;
+ h+=`<div style="margin-top:20px"><button class="btn alt" data-a="st" data-v="doing">${st==='doing'?'In progress':'Start'}</button><button class="btn" data-a="st" data-v="done">${st==='done'?'Mark not done':'Mark done'}</button></div>`;
+ if(A.edit)h+=`<div><button class="btn alt" data-a="rn">Rename</button><button class="btn alt" data-a="del">Delete step</button></div>`;
+ h+=`<h3>Your notes</h3><textarea id="nt" style="min-height:80px">${esc(A.notes[sel])}</textarea><h3>Ask a follow-up</h3>`+(A.chats[sel]||[]).map(c=>`<div class="bub"><b>${esc(c.q)}</b>\n${esc(c.a)}</div>`).join('');
+ h+=`<input id="q" type="text" style="margin-top:8px;max-width:none" placeholder="Ask about this step"${on?'':' readonly'}><p class="err" id="qm"></p>`+(on?`<button class="btn" data-a="ask">Ask</button><p class="small">${A.used} of 30 questions used this month. Extra questions are A$0.50 each, up to your limit.</p>`:'<div id="up"></div>');
+ return h}
+function draw(){
+ const ss=all(),n=ss.filter(s=>A.state[s.id]==='done').length,pc=ss.length?Math.round(n/ss.length*100):0;
+ $('#app').innerHTML=`<h1>${esc(A.title)}</h1><p>${esc(A.summary)}</p><div class="bar"><i style="width:${pc}%"></i></div><p class="small">${n} of ${ss.length} steps complete</p><div class="grid"><div>${A.phases.map((p,i)=>`<div class="ph"><h2>${esc(p.name)}</h2><span class="small">${p.steps.filter(s=>A.state[s.id]==='done').length}/${p.steps.length}</span></div>`+p.steps.map(s=>`<div class="st ${A.state[s.id]==='done'?'done':''} ${sel===s.id?'sel':''}" data-id="${s.id}" tabindex="0" role="button"><button class="cb" data-a="tg" data-id="${s.id}" aria-label="Toggle done">&#10003;</button><div><div class="tt">${esc(s.id)} ${esc(s.title)}</div><div class="small" style="margin:0">${esc(s.summary)}</div></div></div>`).join('')+(A.edit?`<button class="btn alt" data-a="add" data-p="${i}">Add a step</button>`:'')).join('')}</div><aside class="pan${sel?' open':''}">${panel()}</aside></div>`}
+const mark=(id,v)=>{A.state[id]=v;draw();post({action:'toggle',id,status:v})};
+const edit=b=>post(Object.assign({action:'edit'},b)).then(r=>{if(r.error)alert(r.error);else A=r;draw()});
+function look(id){if(det[id])return;post({action:'expand',id}).then(d=>{det[id]=d.error?{err:d.error}:d;if(sel===id)draw()})}
+async function ask(){const q=$('#q').value.trim();if(!q)return;const b=$('[data-a=ask]');b.disabled=true;
+ const r=await post({action:'ask',id:sel,q});b.disabled=false;
+ if(r.error){$('#qm').textContent=r.error==='limit'?'You have reached your limit for extra questions this month. It resets next month.':r.error==='locked'?'Follow-up questions are not active on your plan.':r.error;return}
+ (A.chats[sel]=A.chats[sel]||[]).push({q,a:r.answer});A.used=r.used;draw()}
+function upg(){const u=$('#up');if(!u)return;
+ if(A.sub){u.innerHTML='<p class="small">Email dan.somethingco@gmail.com to add follow-up questions to your plan.</p>';return}
+ u.innerHTML='<div class="sum"><b>Unlock follow-up questions</b><p class="small">30 questions a month included, then A$0.50 each up to the limit you choose.</p><label for="cap">Monthly limit on extra questions</label><select id="cap"><option value="0">Stop at 30</option><option value="10" selected>Up to A$10 extra</option><option value="25">Up to A$25 extra</option></select><div style="margin-top:12px"><button class="btn" data-a="upg" data-e="0">Follow-ups: A$20/month</button><button class="btn alt" data-a="upg" data-e="1">Follow-ups + editing: A$25/month</button></div></div>'}
+async function upgrade(e){const r=await post({action:'upgrade',edit:+e,cap:+$('#cap').value});if(r.url)location.href=r.url;else alert(r.error||'Something went wrong.')}
+$('#app').addEventListener('click',e=>{const t=e.target;
+ if(t.id==='q'&&t.readOnly){upg();return}
+ const el=t.closest('[data-a],[data-id]');if(!el)return;const a=el.dataset.a,id=el.dataset.id;
+ if(a==='tg')mark(id,A.state[id]==='done'?'todo':'done');
+ else if(!a){sel=id;draw();look(id)}
+ else if(a==='close'){sel=null;draw()}
+ else if(a==='st')mark(sel,A.state[sel]===el.dataset.v?'todo':el.dataset.v);
+ else if(a==='rn'){const s=all().find(x=>x.id===sel),v=prompt('Rename step',s.title);if(v)edit({op:'rename',id:sel,title:v})}
+ else if(a==='del'){if(confirm('Delete this step?')){const i=sel;sel=null;edit({op:'delete',id:i})}}
+ else if(a==='add'){const v=prompt('Name your new step');if(v)edit({op:'add',phase:el.dataset.p,title:v})}
+ else if(a==='ask')ask();else if(a==='upg')upgrade(el.dataset.e)});
+$('#app').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList.contains('st'))e.target.click()});
+$('#app').addEventListener('change',e=>{if(e.target.id==='nt'){A.notes[sel]=e.target.value;post({action:'note',id:sel,text:e.target.value})}});
+init();
+</script></body></html>
