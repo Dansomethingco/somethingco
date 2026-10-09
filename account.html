@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>My plans | something.co</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Zilla+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--cream:#F8F6EE;--cream-2:#EEEBDC;--line:#D6D2BF;--ink:#1E1D1A;--soft:#55524A;--slab:'Zilla Slab','Rockwell',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--cream);color:var(--ink);font:17px/1.65 var(--sans)}
+a{color:inherit}:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px}
+header{border-bottom:1px solid var(--line)}
+.nav{display:flex;justify-content:space-between;align-items:center;height:72px}
+.logo{font:500 1.5rem var(--slab);text-decoration:none}
+h1,h2,h3{font-family:var(--slab);font-weight:500;line-height:1.12}
+h1{font-size:clamp(2.2rem,6vw,3.4rem);margin:64px 0 18px}
+h2{font-size:1.6rem;margin:36px 0 10px}h3{font-size:1.25rem}
+p{color:var(--soft)}
+label{display:block;font-weight:700;margin:28px 0 8px}
+input[type=text]{width:100%;max-width:320px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
+textarea{width:100%;min-height:200px;padding:14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px;resize:vertical}
+.btn{display:inline-block;margin-top:18px;padding:14px 24px;border:2px solid var(--ink);background:var(--ink);color:var(--cream);font:700 1rem var(--sans);cursor:pointer;border-radius:2px}
+.btn:hover{background:transparent;color:var(--ink)}.btn:disabled{opacity:.5;cursor:wait}
+.small{font-size:.9rem;margin-top:14px}.err{color:#8A2A1B;font-weight:700;margin-top:14px}
+.stage{border-top:1px solid var(--ink);padding:18px 0}.stage ul,ul.plain{margin:8px 0 0 20px;color:var(--soft)}
+.meta{font-size:.92rem;color:var(--soft);margin-top:6px}
+footer{margin:80px 0 40px;font-size:.9rem;color:var(--soft)}
+select,input[type=email],input[type=tel]{width:100%;max-width:420px;padding:12px 14px;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:2px}
+input[type=text]{max-width:420px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:inherit;background:#fff;border:2px solid var(--line);padding:14px 16px;margin-bottom:10px;cursor:pointer;border-radius:2px}
+.opt b{display:block}.opt span{font-size:.92rem;color:var(--soft)}.opt.sel{border-color:var(--ink);background:var(--cream-2)}
+.navb{display:flex;gap:10px;flex-wrap:wrap}.btn.alt{background:transparent;color:var(--ink)}.btn.alt:hover{background:var(--ink);color:var(--cream)}
+.sum{border:2px solid var(--ink);padding:14px 18px;margin:16px 0}.ln{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}.ln:last-child{border:0;font-weight:700}
+.chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin-top:20px}.chk input{width:20px;height:20px;margin-top:4px}
+[hidden]{display:none!important}
+.plan{display:block;border:2px solid var(--ink);padding:16px 18px;margin-bottom:12px;text-decoration:none;background:#fff}.bar{height:8px;background:var(--line);margin:10px 0 4px}.bar i{display:block;height:100%;background:var(--ink)}</style></head><body>
+<header><div class="wrap nav"><a class="logo" href="index.html">something.co</a><a href="index.html#contact">Contact</a></div></header>
+<main class="wrap"><h1>My plans</h1><p class="small" id="who"></p><div id="list"><p>Loading...</p></div><div class="navb"><a class="btn" href="plan.html">Start a new plan</a><button class="btn alt" id="out">Sign out</button></div><h2>Your data</h2><p>Your ideas are private to you. You can delete your account, plans and notes at any time. This also cancels any active subscription.</p><button class="btn alt" id="del">Delete my account and data</button></main>
+<script>const $=s=>document.querySelector(s),esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const call=a=>fetch('/.netlify/functions/session',{method:'POST',body:JSON.stringify({action:a})});
+(async()=>{const r=await fetch('/.netlify/functions/session');if(r.status===401){location.replace('login.html');return}
+ const d=await r.json();$('#who').textContent='Signed in as '+d.email;
+ $('#list').innerHTML=d.plans.length?d.plans.map(p=>`<a class="plan" href="app.html?t=${p.token}"><b>${esc(p.title)}</b><div class="bar"><i style="width:${p.total?Math.round(p.done/p.total*100):0}%"></i></div><span class="small">${p.done} of ${p.total} steps complete</span></a>`).join(''):'<p>No dashboard plans yet.</p>'})();
+$('#out').onclick=async()=>{await call('logout');location.href='index.html'};
+$('#del').onclick=async()=>{if(confirm('Delete your account, all plans and notes, and cancel any subscription? This cannot be undone.')){await call('delete');location.href='index.html'}};</script></body></html>

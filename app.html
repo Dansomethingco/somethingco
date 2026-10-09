@@ -43,14 +43,14 @@ input[type=text]{max-width:420px}
 @media(max-width:899px){.pan{position:fixed;inset:0;z-index:5;overflow:auto;transform:translateY(100%);transition:transform .2s}.pan.open{transform:none}.back{display:inline-block;margin:0 0 12px}}
 @media(prefers-reduced-motion:reduce){.pan{transition:none}}
 </style></head><body>
-<header><div class="wrap nav"><a class="logo" href="index.html">something.co</a><a href="index.html#contact">Contact</a></div></header>
+<header><div class="wrap nav"><a class="logo" href="index.html">something.co</a><a href="account.html">My plans</a></div></header>
 <main class="wrap w" id="app"><p>Loading your plan...</p></main>
 <script>const $=s=>document.querySelector(s),Q=new URLSearchParams(location.search),T=Q.get('t'),SID=Q.get('sid'),API='/.netlify/functions/app-api';
 const esc=t=>String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const post=b=>fetch(API,{method:'POST',body:JSON.stringify(Object.assign({t:T},b))}).then(r=>r.json()).catch(()=>({error:'Network error. Please try again.'}));
 let A=null,sel=null,det={};const all=()=>A.phases.flatMap(p=>p.steps);
 async function init(){
- if(!T){$('#app').innerHTML='<h1>Open your private dashboard link.</h1><p>You get it right after checkout. Bookmark it: it is your way back in.</p>';return}
+ if(!T){location.replace('account.html');return}
  A=await fetch(API+'?t='+T+(SID?'&sid='+SID:'')).then(r=>r.json()).catch(()=>({error:'Network error.'}));
  if(A.error){$('#app').innerHTML='<h1>We could not open this dashboard.</h1><p>'+esc(A.error)+'</p>';return}
  if(SID)history.replaceState(null,'','app.html?t='+T);draw()}
